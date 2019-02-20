@@ -14,8 +14,15 @@ public:
 
     
     void set(const std::string& key, const std::string& value);
+    std::string get(const std::string& key);
     void erase(const std::string& key);
-    std::string to_string(int status_code);
+    void setStatusCode(int status_code) {
+        status_code_ = status_code;
+    }
+    std::string getPath() const {
+        return header_.find("path")->second;
+    }
+    std::string to_string();
 private:
     using Header = std::map<std::string, std::string>;
 
@@ -24,5 +31,6 @@ private:
     method method_;
     std::string path_;
     std::string protocol_;
+    int status_code_;
     Header header_;
 };

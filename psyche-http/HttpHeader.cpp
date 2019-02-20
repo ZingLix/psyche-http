@@ -1,7 +1,8 @@
 #include "HttpHeader.h"
 
 void HttpHeader::set(const std::string& key, const std::string& value) {
-    header_[key] = value;
+    if (value.length() == 0) erase(key);
+    else header_[key] = value;
 }
 
 void HttpHeader::erase(const std::string& key) {
@@ -55,10 +56,17 @@ HttpHeader::Header HttpHeader::parseHeader(const std::string& header) {
     return result;
 }
 
-std::string HttpHeader::to_string(int status_code) {
+std::string HttpHeader::get(const std::basic_string<char>& key) {
+    auto it = header_.find(key);
+    if (it != header_.end()) return it->second;
+    return std::string();
+}
+
+
+std::string HttpHeader::to_string() {
     std::string s;
     s += "HTTP/1.1 ";
-    switch (status_code) {
+    switch (status_code_) {
     case 200:
         s += "200 OK";
         break;
@@ -69,10 +77,11 @@ std::string HttpHeader::to_string(int status_code) {
         s += "400 BAD REQUEST";
         break;
     default:
+        s += "400 BAD REQUEST";
         break;
     }
     s += "\r\n";
-    for(auto it=header_.begin();it!=header_.end();++it) {
+    for (auto it = header_.begin(); it != header_.end(); ++it) {
         s += it->first + ": " + it->second + "\r\n";
     }
     s += "\r\n";
