@@ -7,6 +7,26 @@ class HttpMessage
 public:
     HttpMessage(){}
     HttpMessage(std::string header):header_(header){}
+    HttpMessage(const HttpMessage& other):
+        header_(other.header_),
+        body_(other.body_)
+    {}
+    HttpMessage(HttpMessage&& other) noexcept:
+        header_(std::move(other.header_)),
+        body_(std::move(other.body_))
+    {}
+
+    HttpMessage& operator=(const HttpMessage& other) {
+        header_ = other.header_;
+        body_ = other.body_;
+        return *this;
+    }
+
+    HttpMessage& operator=(HttpMessage&& other) noexcept {
+        header_ = std::move(other.header_);
+        body_ = std::move(other.body_);
+        return *this;
+    }
 
     std::string getHeader(const std::string& key) {
         return header_.get(key);
