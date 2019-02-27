@@ -12,25 +12,8 @@ void HttpHeader::erase(const std::string& key) {
 HttpHeader::Header HttpHeader::parseHeader(const std::string& header) {
     std::map<std::string, std::string> result;
     auto it = header.begin();
+    it += parseFirstLine(header);
     auto last_it = it;
-    int i = 0;
-    for (;; ++it) {
-        if (*it == ' ' || *it == '\r') {
-            if (i == 0) {
-                result["method"] = std::string(last_it, it);
-            }
-            else if (i == 1) {
-                result["path"] = std::string(last_it, it);
-            }
-            else {
-                result["protocol"] = std::string(last_it, it);
-                last_it = it + 2;
-                break;
-            }
-            ++i;
-            last_it = it + 1;
-        }
-    }
     std::string cur_key, cur_val;
     bool flag = true;
     for (; it != header.end(); ++it) {
@@ -64,22 +47,7 @@ std::string HttpHeader::get(const std::basic_string<char>& key) {
 
 
 std::string HttpHeader::to_string() {
-    std::string s;
-    s += "HTTP/1.1 ";
-    switch (status_code_) {
-    case 200:
-        s += "200 OK";
-        break;
-    case 404:
-        s += "404 NOT FOUND";
-        break;
-    case 400:
-        s += "400 BAD REQUEST";
-        break;
-    default:
-        s += "400 BAD REQUEST";
-        break;
-    }
+    std::string s(firstLine());
     s += "\r\n";
     for (auto it = header_.begin(); it != header_.end(); ++it) {
         s += it->first + ": " + it->second + "\r\n";

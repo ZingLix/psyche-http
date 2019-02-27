@@ -6,18 +6,19 @@
 int main(int argc, char* argv[]) {
     if(argc==1) {
         std::cout << "Please input the website root directory.";
-        return 0;
+        //return 0;
     }
-    DIR* d = opendir(argv[1]);
-    if(d==nullptr) {
-        std::cout << "Directory doesn't exist.";
-        return -1;
-    }
-    closedir(d);
+  //  DIR* d = opendir(argv[1]);
+   // if(d==nullptr) {
+   //     std::cout << "Directory doesn't exist.";
+   //     return -1;
+ //   }
+ //   closedir(d);
     HttpServer server(8898);
-    std::string rootpath(argv[1]);
+//    std::string rootpath(argv[1]);
+    std::string rootpath("/home/vs/blog");
     if (rootpath.back() == '/') rootpath.pop_back();
-    server.setRecvCallback([&](HttpMessage & recvmsg, HttpMessage & sendmsg) {
+    server.setRecvCallback([&](HttpRequest & recvmsg, HttpResponse & sendmsg) {
         std::string path = recvmsg.getPath();
         if (path.back() == '/') path += "index.html";
         path = rootpath + path;
@@ -32,6 +33,7 @@ int main(int argc, char* argv[]) {
             sendmsg.appendBody(std::string(buf,n));
         }
         sendmsg.setStatusCode(200);
+        close(fd);
     });
     server.start();
 }
