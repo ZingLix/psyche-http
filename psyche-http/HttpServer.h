@@ -13,7 +13,7 @@ class HttpServer
 public:
     using RecvCallback=std::function<void(HttpRequest&, HttpResponse&)>;
 
-    HttpServer(std::uint16_t port):server_(port) {
+    HttpServer(std::uint16_t port):server_(port),thread_pool_(16) {
         server_.setReadCallback(std::bind(&HttpServer::handleRequest, this, _1, _2));
     }
 
