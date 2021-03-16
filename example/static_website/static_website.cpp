@@ -1,6 +1,7 @@
 #include <fcntl.h>
 #include <iostream>
 #include <dirent.h>
+#include <unistd.h>
 
 #include "psyche-http/HttpServer.h"
 
