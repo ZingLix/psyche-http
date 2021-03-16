@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 2.6)
+project(psyche-http-static-webstie)
+include_directories(${CMAKE_SOURCE_DIR})
+cmake_policy(SET CMP0015 NEW)
+add_executable(psyche-http-static-webstie static_website.cpp)
+target_link_libraries(psyche-http-static-webstie psyche-http)

@@ -3,36 +3,23 @@
 #include <string>
 #include <memory>
 
+namespace psyche_http
+{
 class HttpMessage
 {
 public:
-    HttpMessage():body_(){}
-    HttpMessage(const HttpMessage& other) :
-        body_(other.body_)
-    {}
-    HttpMessage(HttpMessage&& other) noexcept:
-        body_(std::move(other.body_))
-    {}
+    HttpMessage();
+    HttpMessage(const HttpMessage& other);
+    HttpMessage(HttpMessage&& other) noexcept;
 
-    HttpMessage& operator=(const HttpMessage& other) {
-        body_ = other.body_;
-        return *this;
-    }
+    HttpMessage& operator=(const HttpMessage& other);
+    HttpMessage& operator=(HttpMessage&& other) noexcept;
 
-    HttpMessage& operator=(HttpMessage&& other) noexcept {
-        body_ = std::move(other.body_);
-        return *this;
-    }
+    virtual ~HttpMessage();
 
-    virtual ~HttpMessage(){}
-
-    void appendBody(const std::string& str) {
-        body_ += str;
-    }
-
-    size_t bodyLength() const {
-        return body_.length();
-    }
+    void append_body(const std::string& str);
+    [[nodiscard]]
+    size_t body_length() const;
 
     virtual std::string to_string() = 0;
 
@@ -40,74 +27,46 @@ protected:
     std::string body_;
 };
 
-class HttpRequest:public HttpMessage
+class HttpRequest : public HttpMessage
 {
 public:
-    HttpRequest():HttpMessage(){}
+    HttpRequest();
 
-    HttpRequest(const std::string& message):header_(message) {
+    HttpRequest(const std::string& message);
 
-    }
+    std::string get(const std::string& key);
+    [[nodiscard]]
+    std::string get_path() const;
+    [[nodiscard]]
+    std::string get_protocol() const;
+    [[nodiscard]]
+    HttpHeader::Method get_method() const;
 
-    std::string getPath() {
-        return header_.getPath();
-    }
+    std::string to_string() override;
 
-    std::string getProtocol() {
-        return header_.getProtocol();
-    }
+    void parseHeader(const std::string& msg);
 
-    HttpHeader::method getMethod() {
-        return header_.getMethod();
-    }
-
-    std::string get(const std::string& key) {
-        return header_.get(key);
-    }
-
-    std::string to_string() override {
-        return header_.to_string() + body_;
-    }
-
-    void parseHeader(const std::string& msg) {
-        header_.setHeader(msg);
-    }
-
-    ~HttpRequest(){}
+    ~HttpRequest() override;
 
 private:
     HttpRequestHeader header_;
 };
 
-class HttpResponse :public HttpMessage
+class HttpResponse : public HttpMessage
 {
 public:
-    HttpResponse():HttpMessage() {
+    HttpResponse();
 
-    }
+    void set_status_code(int status_code);
+    void set_content_length();
+    void set_protocol(std::string protocol);
+    void set(const std::string& key, const std::string& value);
 
-    void setStatusCode(int status_code) {
-        header_.setStatusCode(status_code);
-    }
+    std::string to_string() override;
 
-    void setProtocol(std::string protocol){
-        header_.setProtocol(protocol);
-    }
-
-    void set(const std::string& key, const std::string& value) {
-        header_.set(key, value);
-    }
-
-    std::string to_string() override {
-        return header_.to_string() + body_;
-    }
-
-    void setContentLength() {
-        set("Content-Length", std::to_string(bodyLength()));
-    }
-
-    ~HttpResponse(){}
+    ~HttpResponse() override;
 
 private:
     HttpResponseHeader header_;
 };
+}

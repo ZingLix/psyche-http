@@ -7,3 +7,4 @@ project ("psyche-http")
 add_definitions(-std=c++17)
 # Include sub-projects.
 add_subdirectory ("psyche-http")
+add_subdirectory ("example")
