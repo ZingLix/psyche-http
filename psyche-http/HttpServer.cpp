@@ -4,7 +4,7 @@ using namespace std::placeholders;
 using namespace psyche_http;
 
 HttpServer::HttpServer(std::uint16_t port): server_(port), thread_pool_(16) {
-    server_.setReadCallback(std::bind(&HttpServer::handle_request, this, _1, _2));
+    server_.set_read_callback(std::bind(&HttpServer::handle_request, this, _1, _2));
 }
 
 void HttpServer::handle_request(psyche::Connection conn, psyche::Buffer buffer) {
@@ -14,7 +14,7 @@ void HttpServer::handle_request(psyche::Connection conn, psyche::Buffer buffer) 
     bool close_flag = true;
 
     if (it == unfinishedRequest_.end()) {
-        request_msg.parseHeader(buffer.retrieveUntil("\r\n\r\n"));
+        request_msg.parseHeader(buffer.retrieve_until("\r\n\r\n"));
         response_msg.set("Server", "psyche-http/" + PSYCHE_HTTP_VERSION);
         response_msg.set_protocol(request_msg.get_protocol());
         if (request_msg.get("Connection") == "keep-alive") {
@@ -35,7 +35,7 @@ void HttpServer::handle_request(psyche::Connection conn, psyche::Buffer buffer) 
             return;
         }
     }
-    thread_pool_.Execute(
+    thread_pool_.execute(
         [=,con=std::move(conn),request=std::move(request_msg),response=std::move(response_msg)]() mutable
         {
             if (recv_callback_) recv_callback_(request, response);
@@ -57,7 +57,7 @@ void HttpServer::start() {
 
 bool HttpServer::recvBody(psyche::Buffer& buffer, HttpRequest& msg) {
     if(msg.get("Content-Length")=="") {
-        msg.append_body(buffer.retrieveAll());
+        msg.append_body(buffer.retrieve_all());
     }else {
         auto length = std::stoi(msg.get("Content-Length"));
         if (buffer.available() < length) return false;
