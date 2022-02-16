@@ -59,6 +59,14 @@ std::string HttpRequest::to_string() {
     return header_.to_string() + body_;
 }
 
+std::string HttpRequest::get_arguments_value(const std::string& argument) {
+    return this->arguments_[argument];
+}
+
+void HttpRequest::set_arguments(std::map<std::string, std::string>&& arguments) {
+    this->arguments_ = std::move(arguments);
+}
+
 void HttpRequest::parseHeader(const std::string& msg) {
     header_.set_header(msg);
 }
